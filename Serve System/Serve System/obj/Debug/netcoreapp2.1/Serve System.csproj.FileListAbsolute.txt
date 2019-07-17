@@ -1,0 +1,8 @@
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.deps.json
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.runtimeconfig.json
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.runtimeconfig.dev.json
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.dll
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.csprojAssemblyReference.cache
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.csproj.CoreCompileInputs.cache
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.AssemblyInfoInputs.cache
+F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.AssemblyInfo.cs
