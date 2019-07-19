@@ -10,7 +10,7 @@ namespace Serve_System
             CreatDatabase();
             CreatTable();
             Serve server = new Serve();
-            server.Start("192.168.137.1", 1234);
+            server.Start("127.0.0.1", 1234);
         }
 
         //创建数据库

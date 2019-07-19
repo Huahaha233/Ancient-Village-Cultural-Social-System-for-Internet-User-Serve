@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-
-
+using System.Linq;
 
 namespace Serve_System
 {
@@ -17,7 +16,8 @@ namespace Serve_System
         public Conn[] conns;
         //最大连接数
         public int maxConn = 50;
-        public static byte[] imagedata = new byte[1024 * 1024];
+        //协议
+        public ProtocolBase proto;
         //获取连接池索引，返回负数表示获取失败
         public int NewIndex()
         {
@@ -59,7 +59,6 @@ namespace Serve_System
             listenfd.BeginAccept(AcceptCb, null);
             Console.WriteLine("服务器启动成功！");
             Console.ReadKey();
-
         }
         private void AcceptCb(IAsyncResult ar)
         {
@@ -76,10 +75,9 @@ namespace Serve_System
                 {
                     Conn conn = conns[index];
                     conn.Init(socket);
-                    //string adr = conn.GetAdress();
-                    //Console.WriteLine(adr+"已连接" + "ID:" + index);
+                    string adr = conn.GetAdress();
+                    Console.WriteLine(adr + "已连接" + "ID:" + index);
                     conn.socket.BeginReceive(conn.readbuff, conn.buffcount, conn.BuffRemain(), SocketFlags.None, ReceiveCb, conn);
-
                 }
                 listenfd.BeginAccept(AcceptCb, null);
             }
@@ -91,63 +89,105 @@ namespace Serve_System
         private void ReceiveCb(IAsyncResult ar)
         {
             Conn conn = (Conn)ar.AsyncState;
+            lock (conn)
+            {
             try
             {
                 int count = conn.socket.EndReceive(ar);
                 //关闭信号
                 if (count <= 0)
                 {
-                    //Console.WriteLine(conn.GetAdress() + "断开连接");
-                    conn.Close();
-                    return;
+                        Console.WriteLine(conn.GetAdress() + "断开连接");
+                        conn.Close();
+                        return;
                 }
-
-                //数据处理
-                string str = Encoding.UTF8.GetString(conn.readbuff, 0, count);
-                conn.chatnum++;
-                if (conn.chatnum == 1)//chatnum为1时，证明客户端下一条发送的语句为客户端的用户的名称和聊天对象的名称
-                {
-                    string res = str.Replace("发起单人聊天", "");
-                    string[] name = res.Split('向');
-                    conn.username = name[0];
-                    conn.chatname = name[1];
-                    Console.WriteLine(str);
-                    //str = conn.ReadChatContent();//将数据库中的聊天纪录赋值给str，然后发送给客户端用户
-                }
-                else
-                {
-                    conn.SaveInMysql(str);//将信息存入数据库中
-                    Console.WriteLine("接收消息：" + str);
-                }
-
-
-                for (int i = 0; i < conns.Length; i++)
-                {
-                    if (conns[i] == null)
-                        continue;
-                    if (!conns[i].isuse)
-                        continue;
-                    if ((conns[i].username == conn.chatname) || (conns[i].username == conn.username))//如果客户端的用户名等于聊天对象名，则发送消息
-                    {
-                        if (conn.imagecount == 2)
-                        {
-                            conns[i].socket.Send(imagedata);
-                        }
-                        else
-                        {
-                            conns[i].socket.Send(Encoding.UTF8.GetBytes(str));//发送消息给客户端
-                        }
-
-                    }
-                }
-
-                conn.socket.BeginReceive(conn.readbuff, conn.buffcount, conn.BuffRemain(), SocketFlags.None, ReceiveCb, conn);
-
+                    conn.buffcount += count;
+                    //数据处理
+                    ProcessData(conn);
+                    conn.socket.BeginReceive(conn.readbuff, conn.buffcount, conn.BuffRemain(), SocketFlags.None, ReceiveCb, conn);
             }
             catch (Exception e)
             {
                 //Console.WriteLine(conn.GetAdress() + "断开连接");
                 conn.Close();
+            }
+
+            }
+        }
+
+        private void ProcessData(Conn conn)
+        {
+            //小于长度字节
+            if (conn.buffcount < sizeof(Int32))
+            {
+                return;
+            }
+            //消息长度
+            Array.Copy(conn.readbuff, conn.lenBytes, sizeof(Int32));//将readbuff的前4个字节复制到lenbytes中
+            conn.msgLength = BitConverter.ToInt32(conn.lenBytes, 0);//获取消息的长度
+            if (conn.buffcount < conn.msgLength + sizeof(Int32))
+            {
+                return;
+            }
+            //处理消息
+            ProtocolBase protocol = proto.Decode(conn.readbuff, sizeof(Int32), conn.msgLength);
+            //清除已处理的消息
+            int count = conn.buffcount - conn.msgLength - sizeof(Int32);
+            Array.Copy(conn.readbuff, sizeof(Int32) + conn.msgLength, conn.readbuff, 0, count);//将readbuff的中msgLength长度后面的内容复制到readbuff起始位置
+            conn.buffcount = count;
+            if (conn.buffcount > 0)
+            {
+                ProcessData(conn);
+            }
+        }
+
+        //广播
+        public void Broadcast(ProtocolBase protocol)
+        {
+            for (int i = 0; i < conns.Length; i++)
+            {
+                if (!conns[i].isuse)
+                    continue;
+                //if (conns[i].player == null)
+                //    continue;
+                Send(conns[i], protocol);
+            }
+        }
+
+        //发送
+        public void Send(Conn conn, ProtocolBase protocol)
+        {
+            byte[] bytes = protocol.Encode();
+            byte[] length = BitConverter.GetBytes(bytes.Length);
+            byte[] sendbuff = length.Concat(bytes).ToArray();
+            try
+            {
+                conn.socket.BeginSend(sendbuff, 0, sendbuff.Length, SocketFlags.None, null, null);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[发送消息]" + conn.GetAdress() + " : " + e.Message);
+            }
+        }
+
+        
+
+        //打印信息
+        public void Print()
+        {
+            Console.WriteLine("===服务器登录信息===");
+            for (int i = 0; i < conns.Length; i++)
+            {
+                if (conns[i] == null)
+                    continue;
+                if (!conns[i].isuse)
+                    continue;
+
+                string str = "连接[" + conns[i].GetAdress() + "] ";
+                //if (conns[i].player != null)
+                //    str += "玩家id " + conns[i].player.id;
+
+                Console.WriteLine(str);
             }
         }
     }

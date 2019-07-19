@@ -10,7 +10,6 @@ namespace Serve_System
     {
         void CreatDatabase(string MysqlStatment);//创建数据库
         void CreatTable(string sql);//创建数据库表
-
     }
     public class MysqlHandle : IMysqlHandle
     {
@@ -58,6 +57,42 @@ namespace Serve_System
             {
                 myconn.Close();
             }
+        }
+
+        //增
+        public void Add()
+        {
+            string Mysql_change = string.Format("insert into user set id='{0}',pw='{1}';",0,1);
+        }
+
+        //查
+        public string Read(string commandtext,int index,int outdex,string ReadText)//commandtext为查找表名的命令语句、index为传入属性的列数、outdex为需要查找的属性的列数、ReadText传入的查找条件
+        {
+            string connetStr = "server=127.0.0.1;port=3306;user=root;password=123456;database=chatroom;Sslmode=none";//注意Sslmode要赋值为none，否则无法连接到数据库
+            MySqlConnection conn = new MySqlConnection(connetStr);
+            conn.Open();
+            MySqlCommand command = null;
+            MySqlDataReader dataReader = null;
+            try
+            {
+                string str = "";//注意""与null是有区别的，若是return的值为null则会报错。
+                command = conn.CreateCommand();
+                command.CommandText = commandtext;
+                dataReader = command.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    if ((dataReader.GetString(index) == ReadText))
+                    {
+                        str= dataReader.GetString(outdex);
+                    }
+                }
+                return str;
+            }
+            catch
+            {
+                return "";
+            }
+            finally { conn.Close(); }
         }
     }
 }
