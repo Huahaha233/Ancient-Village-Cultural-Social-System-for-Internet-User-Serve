@@ -21,13 +21,18 @@ public partial class HandleConnMsg
 		string protoName = protocol.GetString (start, ref start);
 		string id = protocol.GetString (start, ref start);
 		string pw = protocol.GetString (start, ref start);
-		string strFormat = "[收到注册协议]" + conn.GetAdress();
-		Console.WriteLine ( strFormat  + " 用户名：" + id + " 密码：" + pw);
+        string sex = protocol.GetString(start, ref start);
+        string adr = protocol.GetString(start, ref start);
+        string que = protocol.GetString(start, ref start);
+        string ans = protocol.GetString(start, ref start);
+        string phone = protocol.GetString(start, ref start);
+        string strFormat = "[收到注册协议]" + conn.GetAdress();
+		Console.WriteLine ( strFormat  + " 用户名：" + id + " 密码：" + pw + " 性别：" + sex + " 住址：" + adr + " 密保问题：" + que + " 密保答案：" + phone+" 联系方式：" + phone);
 		//构建返回协议
 		protocol = new ProtocolBytes ();
 		protocol.AddString ("Register");
 		//注册
-		if(DataMgr.instance.Register (id, pw))
+		if(DataMgr.instance.Register (id, pw,sex,adr,que,ans,phone))
 		{
 			protocol.AddInt(0);
 		}
@@ -110,4 +115,58 @@ public partial class HandleConnMsg
 			conn.player.Logout();
 		}
 	}
+    
+    //忘记密码
+    public void MsgSendForget(Conn conn, ProtocolBase protoBase)
+    {
+        //获取数值
+        int start = 0;
+        ProtocolBytes protocol = (ProtocolBytes)protoBase;
+        string protoName = protocol.GetString(start, ref start);
+        string id = protocol.GetString(start, ref start);
+        string strFormat = "[收到忘记密码协议]" + conn.GetAdress();
+        Console.WriteLine(strFormat + " 用户名：" + id);
+        //构建返回协议
+        protocol = new ProtocolBytes();
+        protocol.AddString("Register");
+        //注册
+        if (DataMgr.instance.Forget(id)!="false")
+        {
+            string[] str = DataMgr.instance.Forget(id).Split(";");
+            protocol.AddString(str[0]);//密保问题
+            protocol.AddString(str[1]);//密保答案
+        }
+        else
+        {
+            protocol.AddString("false");
+        }
+        //返回协议给客户端
+        conn.Send(protocol);
+    }
+
+    //重置密码
+    public void MsgReset(Conn conn, ProtocolBase protoBase)
+    {
+        //获取数值
+        int start = 0;
+        ProtocolBytes protocol = (ProtocolBytes)protoBase;
+        string protoName = protocol.GetString(start, ref start);
+        string pw = protocol.GetString(start, ref start);
+        string strFormat = "[收到注册协议]" + conn.GetAdress();
+        Console.WriteLine(strFormat + " 密码：" + pw);
+        //构建返回协议
+        protocol = new ProtocolBytes();
+        protocol.AddString("Register");
+        //注册
+        if (DataMgr.instance.Reset(pw))
+        {
+            protocol.AddInt(0);
+        }
+        else
+        {
+            protocol.AddInt(-1);
+        }
+        //返回协议给客户端
+        conn.Send(protocol);
+    }
 }

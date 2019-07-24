@@ -10,7 +10,7 @@ using System.IO;
 public class DataMgr
 {
 	MySqlConnection sqlConn;
-	
+    private string SendForgetID = "";//用户在选择忘记密码按钮时，单独发送ID以此来获取密保问题与密保答案
 	//单例模式
 	public static DataMgr instance;
 	public DataMgr()
@@ -67,7 +67,7 @@ public class DataMgr
 	}
 	
 	//注册
-	public bool Register(string id, string pw)
+	public bool Register(string id, string pw, string sex, string adr,string que,string ans,string phone)
 	{
 		//防sql注入
 		if (!IsSafeStr (id) || !IsSafeStr (pw)) 
@@ -82,7 +82,7 @@ public class DataMgr
 			return false;
 		}
 		//写入数据库User表
-		string cmdStr = string.Format("insert into user set id ='{0}' ,pw ='{1}';", id, pw);
+		string cmdStr = string.Format("insert into user set id ='{0}' ,pw ='{1}',sex='{2}',adr='{3}',que='{4}',ans='{5}',phone='{6}';", id, pw,sex,adr,que,ans,phone);
 		MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
 		try
 		{
@@ -96,8 +96,73 @@ public class DataMgr
 		}
 	}
 
-	//创建角色
-	public bool CreatePlayer(string id)
+    //忘记密码
+    public string Forget(string id)
+    {
+        string que="";//密保问题
+        string ans="";//密保答案
+        SendForgetID = id;//赋值，以便将ID传入重置密码协议当中
+        //防sql注入
+        if (!IsSafeStr(id))
+        {
+            Console.WriteLine("[DataMgr]Register 使用非法字符");
+            return "false";
+        }
+        //能否存在该用户
+        if (!CanRegister(id))
+        {
+            Console.WriteLine("[DataMgr]Register !CanRegister");
+            return "false";
+        }
+        //读取数据库User表
+        string cmdStr = string.Format("select * from user where id='{0}';", id);
+        MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
+        try
+        {
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                que = dataReader.GetString(4);
+                ans = dataReader.GetString(5);
+            }
+            dataReader.Close();
+            return que+";"+ans;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("[DataMgr]Register " + e.Message);
+            return "false";
+        }
+    }
+
+    //重置密码
+    public bool Reset(string pw)
+    {
+        //防sql注入
+        if (!IsSafeStr(pw))
+        {
+            Console.WriteLine("[DataMgr]Register 使用非法字符");
+            return false;
+        }
+        string formatStr = "update user set pw =@data where id = '{0}';";
+        string cmdStr = string.Format(formatStr, SendForgetID);
+        MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
+        cmd.Parameters.AddWithValue("@data", pw);
+        //将修改后的密码存入数据库User表
+        try
+        {
+            cmd.ExecuteNonQuery();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("[DataMgr]Register " + e.Message);
+            return false;
+        }
+    }
+
+    //创建角色
+    public bool CreatePlayer(string id)
 	{
 		//防sql注入
 		if (!IsSafeStr(id))
@@ -227,7 +292,7 @@ public class DataMgr
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);
 		cmd.Parameters.Add ("@data", MySqlDbType.Blob);
 		cmd.Parameters[0].Value = byteArr;
-		try 
+		try
 		{
 			cmd.ExecuteNonQuery ();
 			return true;
@@ -238,4 +303,5 @@ public class DataMgr
 			return false;
 		}
 	}
+
 }

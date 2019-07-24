@@ -192,7 +192,7 @@ public class ServNet
 	{
 		string name = protoBase.GetName();
 		string methodName = "Msg" + name;
-		//连接协议分发
+		//连接协议分发,即当用户未登录成功时执行
 		if (conn.player == null || name == "HeatBeat"|| name == "Logout") 
 		{
 			MethodInfo mm = handleConnMsg.GetType ().GetMethod (methodName);
