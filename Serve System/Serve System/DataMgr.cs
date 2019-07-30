@@ -23,8 +23,8 @@ public class DataMgr
 	public void Connect()
 	{
 		//数据库
-		string connStr = "Database=game;Data Source=127.0.0.1;";
-		connStr += "User Id=root;Password=123456;port=3306";
+		string connStr = "Database=village;Data Source=127.0.0.1;";
+		connStr += "User Id=root;Password=123456789;port=3306";
 		sqlConn = new MySqlConnection(connStr);
 		try
 		{
@@ -50,7 +50,7 @@ public class DataMgr
 		if (!IsSafeStr(id))
 			return false;
 		//查询id是否存在
-		string cmdStr = string.Format("select * from user where id='{0}';", id);  
+		string cmdStr = string.Format("select * from user where UserID='{0}';", id);  
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);  
 		try 
 		{
@@ -82,7 +82,7 @@ public class DataMgr
 			return false;
 		}
 		//写入数据库User表
-		string cmdStr = string.Format("insert into user set id ='{0}' ,pw ='{1}',sex='{2}',adr='{3}',que='{4}',ans='{5}',phone='{6}';", id, pw,sex,adr,que,ans,phone);
+		string cmdStr = string.Format("insert into user set UserID ='{0}' ,UserPSW ='{1}',Sex='{2}',Adress='{3}',Question='{4}',Answer='{5}',Phone='{6}';", id, pw,sex,adr,que,ans,phone);
 		MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
 		try
 		{
@@ -115,7 +115,7 @@ public class DataMgr
             return "false";
         }
         //读取数据库User表
-        string cmdStr = string.Format("select * from user where id='{0}';", id);
+        string cmdStr = string.Format("select * from user where UserID='{0}';", id);
         MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
         try
         {
@@ -144,7 +144,7 @@ public class DataMgr
             Console.WriteLine("[DataMgr]Register 使用非法字符");
             return false;
         }
-        string formatStr = "update user set pw =@data where id = '{0}';";
+        string formatStr = "update user set UserPSW =@data where UserID = '{0}';";
         string cmdStr = string.Format(formatStr, SendForgetID);
         MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
         cmd.Parameters.AddWithValue("@data", pw);
@@ -182,7 +182,7 @@ public class DataMgr
 		}
 		byte[] byteArr = stream.ToArray();
 		//写入数据库
-		string cmdStr = string.Format ("insert into player set id ='{0}' ,data =@data;",id);
+		string cmdStr = string.Format ("insert into player set UserID ='{0}' ,data =@data;",id);
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);
 		cmd.Parameters.Add ("@data", MySqlDbType.Blob);
 		cmd.Parameters[0].Value = byteArr;
@@ -205,7 +205,7 @@ public class DataMgr
 		if (!IsSafeStr (id)||!IsSafeStr (pw))
 			return false;
 		//查询
-		string cmdStr = string.Format("select * from user where id='{0}' and pw='{1}';", id, pw);  
+		string cmdStr = string.Format("select * from user where UserID='{0}' and UserPSW='{1}';", id, pw);  
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);  
 		try 
 		{
