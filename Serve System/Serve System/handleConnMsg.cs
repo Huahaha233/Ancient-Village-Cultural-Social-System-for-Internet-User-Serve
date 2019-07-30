@@ -65,7 +65,7 @@ public partial class HandleConnMsg
 		//验证
 		if (!DataMgr.instance.CheckPassWord (id, pw)) 
 		{
-			protocolRet.AddInt(-1);
+            protocolRet.AddInt(-1);
 			conn.Send (protocolRet);
 			return;
 		}
@@ -78,18 +78,19 @@ public partial class HandleConnMsg
 			conn.Send (protocolRet);
 			return;
 		}
-		//获取玩家数据
-		PlayerData playerData = DataMgr.instance.GetPlayerData (id);
-		if (playerData == null)
-		{
-			protocolRet.AddInt(-1);
-			conn.Send (protocolRet);
-			return;
-		}
-		conn.player = new Player (id, conn);
-		conn.player.data = playerData;
-		//事件触发
-		ServNet.instance.handlePlayerEvent.OnLogin(conn.player);
+
+		////获取玩家数据
+		//PlayerData playerData = DataMgr.instance.GetPlayerData (id);
+		//if (playerData == null)
+		//{
+		//	protocolRet.AddInt(-1);
+		//	conn.Send (protocolRet);
+		//	return;
+		//}
+		//conn.player = new Player (id, conn);
+		//conn.player.data = playerData;
+		////事件触发
+		//ServNet.instance.handlePlayerEvent.OnLogin(conn.player);
 		//返回
 		protocolRet.AddInt(0);
 		conn.Send (protocolRet);
@@ -128,13 +129,11 @@ public partial class HandleConnMsg
         Console.WriteLine(strFormat + " 用户名：" + id);
         //构建返回协议
         protocol = new ProtocolBytes();
-        protocol.AddString("Register");
+        protocol.AddString("SendForget");
         //注册
         if (DataMgr.instance.Forget(id)!="false")
         {
-            string[] str = DataMgr.instance.Forget(id).Split(";");
-            protocol.AddString(str[0]);//密保问题
-            protocol.AddString(str[1]);//密保答案
+            protocol.AddString(DataMgr.instance.Forget(id));//密保问题
         }
         else
         {
@@ -152,11 +151,11 @@ public partial class HandleConnMsg
         ProtocolBytes protocol = (ProtocolBytes)protoBase;
         string protoName = protocol.GetString(start, ref start);
         string pw = protocol.GetString(start, ref start);
-        string strFormat = "[收到注册协议]" + conn.GetAdress();
+        string strFormat = "[收到重置密码协议]" + conn.GetAdress();
         Console.WriteLine(strFormat + " 密码：" + pw);
         //构建返回协议
         protocol = new ProtocolBytes();
-        protocol.AddString("Register");
+        protocol.AddString("Reset");
         //注册
         if (DataMgr.instance.Reset(pw))
         {

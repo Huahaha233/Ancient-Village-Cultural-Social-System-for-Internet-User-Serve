@@ -109,7 +109,7 @@ public class DataMgr
             return "false";
         }
         //能否存在该用户
-        if (!CanRegister(id))
+        if (CanRegister(id))
         {
             Console.WriteLine("[DataMgr]Register !CanRegister");
             return "false";
@@ -126,6 +126,7 @@ public class DataMgr
                 ans = dataReader.GetString(5);
             }
             dataReader.Close();
+            Console.WriteLine(que + ";" + ans);
             return que+";"+ans;
         }
         catch (Exception e)
