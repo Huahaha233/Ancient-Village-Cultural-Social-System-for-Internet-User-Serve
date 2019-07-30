@@ -41,7 +41,7 @@ namespace Serv
         public void CreatTable()//创建数据库表
         {
             //下表为用户注册信息，存放用户的用户名密码等信息
-            string sql = "CREATE TABLE IF NOT EXISTS `user` (`UserID` CHAR(10) NOT NULL,  `UserPSW` CHAR(10) NOT NULL, `Sex` CHAR(1) NOT NULL,`Adress` CHAR(50) NOT NULL,`Question` CHAR(50) NOT NULL,`Answer` CHAR(50) NOT NULL,`Phone` CHAR(11) NOT NULL,PRIMARY KEY(`UserID`)) DEFAULT CHARSET = utf8";
+            string sql = "CREATE TABLE IF NOT EXISTS `user` (`UserID` CHAR(10) NOT NULL,  `UserPSW` CHAR(10) NOT NULL, `Sex` CHAR(1) NOT NULL,`Adress` CHAR(50) NOT NULL,`Question` CHAR(50) NOT NULL,`Answer` CHAR(20) NOT NULL,`Phone` CHAR(11) NOT NULL,PRIMARY KEY(`UserID`)) DEFAULT CHARSET = utf8";
             ChangeMysql(sql);
         }
 
