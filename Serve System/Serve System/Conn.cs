@@ -32,8 +32,8 @@ public class Conn
 	public Conn()
 	{
 		readBuff = new byte[BUFFER_SIZE];
-		
 	}
+
 	//初始化
 	public void Init(Socket socket)
 	{

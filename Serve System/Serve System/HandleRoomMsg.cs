@@ -49,14 +49,7 @@ public partial class HandlePlayerMsg
 			return;
 		}
 		Room room = RoomMgr.instance.list[index];
-		//判断房间是状态
-		if(room.status != Room.Status.Prepare)
-		{
-			Console.WriteLine ("MsgEnterRoom status err " + player.id);
-			protocol.AddInt(-1);
-			player.Send (protocol);
-			return;
-		}
+
 		//添加玩家
 		if (room.AddPlayer (player))
 		{
@@ -99,6 +92,7 @@ public partial class HandlePlayerMsg
 			player.Send (protocol);
 			return;
 		}
+
 		//处理
 		protocol.AddInt (0);
 		player.Send (protocol);
