@@ -9,18 +9,19 @@ public class PlayerTempData
     {
         None,
         Room,
-        Fight,
+        //Visit,
     }
     public Status status;
     //room状态
     public Room room;
-    public int team = 1;
-    public bool isOwner = false;
+    //public Room room;
+    //public int team = 1;
+    //public bool isOwner = false;
     //战场相关
     public long lastUpdateTime;
     public float posX;
     public float posY;
     public float posZ;
-    public long lastShootTime;
-    public float hp = 100;
+    //public long lastShootTime;
+    //public float hp = 100;
 }

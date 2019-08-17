@@ -63,13 +63,12 @@ public class Scene
 			protocol.AddFloat(p.x);
 			protocol.AddFloat(p.y);
 			protocol.AddFloat(p.z);
-			protocol.AddInt(p.score);
 		}
 		player.Send(protocol);
 	}
 	
 	//更新信息
-	public void UpdateInfo(string id, float x, float y, float z, int score)
+	public void UpdateInfo(string id, float x, float y, float z)
 	{
 		int count = list.Count;
 		ProtocolBytes protocol = new ProtocolBytes();
@@ -79,6 +78,5 @@ public class Scene
 		p.x = x;
 		p.y = y;
 		p.z = z;
-		p.score = score;
 	}
 }
