@@ -56,10 +56,18 @@ public class RoomMgr
 			Room room = list[i];
             protocol.AddString(room.Name); 
 			protocol.AddInt(room.list.Count);//房间中的人数
-            protocol.AddString(room.Ins);
             protocol.AddString(room.Author);
         }
 		return protocol;
 	}
 
+    //获取房间信息
+    public ProtocolBytes GetRoomInfo(int index)
+    {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("GetRoomInfo");
+        //房间信息
+        protocol.AddString(list[index].Ins);//房间的简介
+        return protocol;
+    }
 }

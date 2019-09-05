@@ -28,8 +28,27 @@ public partial class HandlePlayerMsg
 		Console.WriteLine ("MsgCreateRoom Ok " + player.id);
 	}
 
-	//加入房间
-	public void MsgEnterRoom(Player player, ProtocolBase protoBase)
+    //管理房间
+    public void MsgManageRoom(Player player, ProtocolBase protoBase)
+    {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("ManageRoom");
+        //条件检测
+        if (player.tempData.status != PlayerTempData.Status.None)
+        {
+            Console.WriteLine("MsgManageRoom Fail " + player.id);
+            protocol.AddInt(-1);
+            player.Send(protocol);
+            return;
+        }
+        RoomMgr.instance.CreateRoom(player);
+        protocol.AddInt(0);
+        player.Send(protocol);
+        Console.WriteLine("MsgManageRoom Ok " + player.id);
+    }
+
+    //加入房间
+    public void MsgEnterRoom(Player player, ProtocolBase protoBase)
 	{
 		//获取数值
 		int start = 0;
@@ -53,7 +72,7 @@ public partial class HandlePlayerMsg
 		//添加玩家
 		if (room.AddPlayer (player))
 		{
-			room.Broadcast(room.GetRoomInfo());
+			room.Broadcast(RoomMgr.instance.GetRoomList());
 			protocol.AddInt(0);
 			player.Send (protocol);
 		}
@@ -65,21 +84,25 @@ public partial class HandlePlayerMsg
 		}
 	}
 
-	//获取房间信息
-	//public void MsgGetRoomInfo(Player player, ProtocolBase protoBase)
-	//{
-		
-	//	if (player.tempData.status != PlayerTempData.Status.Room) 
-	//	{
-	//		Console.WriteLine ("MsgGetRoomInfo status err " + player.id);
-	//		return;
-	//	}
-	//	Room room = player.data.room;
-	//	player.Send (room.GetRoomInfo());
-	//}
+    //获取房间信息
+    public void MsgGetRoomInfo(Player player, ProtocolBase protoBase)
+    {
+        if (player.tempData.status != PlayerTempData.Status.None)
+        {
+            Console.WriteLine("MsgGetRoomInfo status err " + player.id);
+            return;
+        }
+        int start = 0;
+        ProtocolBytes protocol = (ProtocolBytes)protoBase;
+        string protoName = protocol.GetString(start, ref start);
+        int index = protocol.GetInt(start, ref start);//房间序号
+        //Room room = player.tempData.room;
+        //player.Send(room.GetRoomInfo());
+        player.Send(RoomMgr.instance.GetRoomInfo(index));
+	}
 
-	//离开房间
-	public void MsgLeaveRoom(Player player, ProtocolBase protoBase)
+    //离开房间
+    public void MsgLeaveRoom(Player player, ProtocolBase protoBase)
 	{
 		ProtocolBytes protocol = new ProtocolBytes ();
 		protocol.AddString ("LeaveRoom");
@@ -100,7 +123,7 @@ public partial class HandlePlayerMsg
 		RoomMgr.instance.LeaveRoom (player);
 		//广播
 		if(room != null)
-			room.Broadcast(room.GetRoomInfo());
+			room.Broadcast(RoomMgr.instance.GetRoomList());
 	}
 
     //同步用户

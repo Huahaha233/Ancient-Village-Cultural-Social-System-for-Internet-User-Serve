@@ -59,27 +59,7 @@ public class Room
 			player.Send(protocol);
 		}
 	}
-
-	//房间信息
-	public ProtocolBytes GetRoomInfo()
-	{
-		ProtocolBytes protocol = new ProtocolBytes ();
-		protocol.AddString ("GetRoomInfo");
-		//房间信息
-		protocol.AddInt (list.Count);
-		//每个玩家信息
-		foreach(Player p in list.Values)
-		{
-			protocol.AddString(p.id);
-			//protocol.AddInt(p.tempData.team);
-			//protocol.AddInt(p.data.win);
-			//protocol.AddInt(p.data.fail);
-			//int isOwner = p.tempData.isOwner? 1: 0;
-			//protocol.AddInt(isOwner);
-		}
-		return protocol;
-	}
-
+    
     ////房间能否浏览
     //public bool CanStart()
     //{
