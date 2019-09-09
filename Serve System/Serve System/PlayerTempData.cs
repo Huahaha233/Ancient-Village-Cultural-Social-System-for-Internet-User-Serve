@@ -9,15 +9,10 @@ public class PlayerTempData
     {
         None,
         Room,
-        //Visit,
     }
     public Status status;
-    //room状态
-    public Room room;
-    //public Room room;
-    //public int team = 1;
-    //public bool isOwner = false;
-    //战场相关
+    public Room room;//当前用户进入的展厅
+    //展厅相关
     public long lastUpdateTime;
     public float posX;
     public float posY;

@@ -19,9 +19,9 @@ public class Room
     public string Author;//房间的创建者
 
 	public Dictionary<string,Player> list = new Dictionary<string,Player>();
-    public List<byte[]> picture = new List<byte[]>();
-    public List<byte[]> video = new List<byte[]>();
-    public List<byte[]> model = new List<byte[]>();
+    public List<Resoure> picture = new List<Resoure>();
+    public List<Resoure> video = new List<Resoure>();
+    public List<Resoure> model = new List<Resoure>();
     //添加玩家
     public bool AddPlayer(Player player)
 	{
@@ -50,9 +50,31 @@ public class Room
 			list.Remove(id);
 		}
 	}
-    
-	//广播
-	public void Broadcast(ProtocolBase protocol)
+    //删除房间
+    public bool DeleteResoure(Player player,string ResoureName,string sort)
+    {
+        Resoure resoure = new Resoure();
+        foreach (Resoure resoures in picture)
+        {
+            if (resoures.resourename == ResoureName)
+            {
+                resoure = resoures;
+                break;
+            }
+        }
+        if (resoure != null)
+        {
+            lock (picture)
+            {
+                picture.Remove(resoure);
+                return true;
+            }
+        }
+        else return false;
+
+    }
+    //广播
+    public void Broadcast(ProtocolBase protocol)
 	{
 		foreach(Player player in list.Values)
 		{

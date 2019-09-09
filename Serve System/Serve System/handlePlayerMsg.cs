@@ -10,19 +10,19 @@ public partial class HandlePlayerMsg
 		ProtocolBytes protocolRet = new ProtocolBytes ();
 		protocolRet.AddString ("GetData");
         protocolRet.AddInt(player.tempData.room.picture.Count);
-        foreach(byte[] data in player.tempData.room.picture)
+        foreach(Resoure resoure in player.tempData.room.picture)
         {
-            protocolRet.AddByte(data);
+            protocolRet.AddByte(resoure.resourebytes);
         }
         protocolRet.AddInt(player.tempData.room.video.Count);
-        foreach (byte[] data in player.tempData.room.video)
+        foreach (Resoure resoure in player.tempData.room.video)
         {
-            protocolRet.AddByte(data);
+            protocolRet.AddByte(resoure.resourebytes);
         }
         protocolRet.AddInt(player.tempData.room.model.Count);
-        foreach (byte[] data in player.tempData.room.model)
+        foreach (Resoure resoure in player.tempData.room.model)
         {
-            protocolRet.AddByte(data);
+            protocolRet.AddByte(resoure.resourebytes);
         }
         player.Send (protocolRet);
 		Console.WriteLine ("MsgGetData " + player.id);
@@ -37,18 +37,20 @@ public partial class HandlePlayerMsg
 		ProtocolBytes protocol = (ProtocolBytes)protoBase;
 		string protoName = protocol.GetString (start, ref start);
         string DataSort= protocol.GetString(start, ref start);
+        Resoure resoure = new Resoure();
+        resoure.resourebytes = protocol.GetByte(start, ref start);
         switch (DataSort)
         {
             case "picture":
-                player.tempData.room.picture.Add(protocol.GetByte(start, ref start));
+                player.tempData.room.picture.Add(resoure);
                 player.data.picturecount++;
                 break;
             case "video":
-                player.tempData.room.video.Add(protocol.GetByte(start, ref start));
+                player.tempData.room.video.Add(resoure);
                 player.data.videocount++;
                 break;
             case "model":
-                player.tempData.room.model.Add(protocol.GetByte(start, ref start));
+                player.tempData.room.model.Add(resoure);
                 player.data.modelcount++;
                 break;
         }

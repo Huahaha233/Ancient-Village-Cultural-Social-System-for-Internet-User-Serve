@@ -4,9 +4,7 @@ using System.Collections.Generic;
 [Serializable]
 public class PlayerData
 {
-    //public int score = 0;
-    //public int win = 0;
-    //public int fail = 0;
+    public List<Room> rooms;//当前用户创建的房间
     public int picturecount = 0;
     public int videocount = 0;
     public int modelcount = 0;

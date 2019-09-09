@@ -15,18 +15,44 @@ public class RoomMgr
 	public List<Room> list = new List<Room>();
 
 	//创建房间
-	public void CreateRoom(Player player)
+	public void CreateRoom(Player player,string RoomName,string RoomIns)
 	{
 		Room room = new Room ();
 		lock (list) 
 		{
             room.Author = player.id;//将创建房间的玩家的ID赋值给房间
+            room.Name = RoomName;
+            room.Ins = RoomIns;
+            player.data.rooms.Add(room);
 			list.Add(room);
 		}
 	}
-
-	//玩家离开
-	public void LeaveRoom(Player player)
+    //删除房间
+    public bool DeleteRoom(Player player, string RoomName)
+    {
+        Room room = new Room();
+        foreach(Room rooms in list)
+        {
+            if (rooms.Name == RoomName)
+            {
+                room = rooms;
+                break;
+            }
+        }
+        if (room != null)
+        {
+            lock (list)
+            {
+                list.Remove(room);
+                player.data.rooms.Remove(room);
+                return true;
+            }
+        }
+        else return false;
+        
+    }
+    //玩家离开
+    public void LeaveRoom(Player player)
 	{
 		PlayerTempData tempdata = player.tempData;
 		if (player.tempData.status == PlayerTempData.Status.None)
@@ -37,8 +63,6 @@ public class RoomMgr
 		lock(list)
 		{
 			room.DelPlayer(player.id);
-			//if(room.list.Count == 0)//当房间内的人数为0时，删除房间
-			//	list.Remove(room);
 		}
 	}
 
@@ -69,5 +93,12 @@ public class RoomMgr
         //房间信息
         protocol.AddString(list[index].Ins);//房间的简介
         return protocol;
+    }
+
+    //判断当前用户是否已创建房间
+    public bool HaveRoom(Player player)
+    {
+        if (player.data.rooms.Count!=0) return true;
+        return false;
     }
 }
