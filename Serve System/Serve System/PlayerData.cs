@@ -4,12 +4,13 @@ using System.Collections.Generic;
 [Serializable]
 public class PlayerData
 {
-    public List<Room> rooms;//当前用户创建的房间
-    public int picturecount = 0;
-    public int videocount = 0;
-    public int modelcount = 0;
+    public int picturecount;
+    public int videocount;
+    public int modelcount;
     public PlayerData()
 	{
-        
-	}
+        picturecount = 0;
+        videocount = 0;
+        modelcount = 0;
+    }
 }

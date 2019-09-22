@@ -7,7 +7,7 @@ public partial class HandlePlayerMsg
 	public void MsgGetRoomList(Player player, ProtocolBase protoBase)
 	{
 		player.Send (RoomMgr.instance.GetRoomList());
-	}
+    }
 
     //判断用户是否含有已创建的房间
     public void MsgHaveRoom(Player player, ProtocolBase protoBase)
@@ -42,25 +42,25 @@ public partial class HandlePlayerMsg
     {
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("GetResoureList");
-        protocol.AddInt(player.data.rooms.Count);
-        for(int i=0;i< player.data.rooms.Count; i++)
+        protocol.AddInt(player.tempData.rooms.Count);
+        for(int i=0;i< player.tempData.rooms.Count; i++)
         {
-            protocol.AddString(player.data.rooms[i].Name);
+            protocol.AddString(player.tempData.rooms[i].Name);
             protocol.AddInt(player.data.picturecount+player.data.videocount+player.data.modelcount);
             for(int p=0;p< player.data.picturecount; p++)
             {
-                protocol.AddString(player.data.rooms[i].picture[p].resourename);
-                protocol.AddString(player.data.rooms[i].picture[p].resouresourt);
+                protocol.AddString(player.tempData.rooms[i].picture[p].resourename);
+                protocol.AddString(player.tempData.rooms[i].picture[p].resouresourt);
             }
             for (int v = 0; v < player.data.picturecount; v++)
             {
-                protocol.AddString(player.data.rooms[i].video[v].resourename);
-                protocol.AddString(player.data.rooms[i].video[v].resouresourt);
+                protocol.AddString(player.tempData.rooms[i].video[v].resourename);
+                protocol.AddString(player.tempData.rooms[i].video[v].resouresourt);
             }
             for (int m = 0; m < player.data.picturecount; m++)
             {
-                protocol.AddString(player.data.rooms[i].model[m].resourename);
-                protocol.AddString(player.data.rooms[i].model[m].resouresourt);
+                protocol.AddString(player.tempData.rooms[i].model[m].resourename);
+                protocol.AddString(player.tempData.rooms[i].model[m].resouresourt);
             }
         }
         player.Send(protocol);
@@ -74,9 +74,8 @@ public partial class HandlePlayerMsg
 		int start = 0;
 		ProtocolBytes protocol = (ProtocolBytes)protoBase;
 		string protoName = protocol.GetString (start, ref start);
-		int index = protocol.GetInt (start, ref start);
-		Console.WriteLine ("[收到MsgEnterRoom]" + player.id + " " + index);
-		//
+		int index = protocol.GetInt (start, ref start)-1; //这里需要减1，由于传入的值是从1开始的，而list从0开始
+        Console.WriteLine ("[收到MsgEnterRoom]" + player.id + " " + index);
 		protocol = new ProtocolBytes ();
 		protocol.AddString ("EnterRoom");
 		//判断房间是否存在
@@ -165,7 +164,7 @@ public partial class HandlePlayerMsg
         string sort = protocol.GetString(start, ref start);//类型名称
         ProtocolBytes proto = new ProtocolBytes();
         proto.AddString("DeleteResoure");
-        foreach(Room room in player.data.rooms)
+        foreach(Room room in player.tempData.rooms)
         {
             if(room.Name==roomname)
             {

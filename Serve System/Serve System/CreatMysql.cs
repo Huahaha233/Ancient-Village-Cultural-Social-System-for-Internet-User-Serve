@@ -43,6 +43,10 @@ namespace Serv
             //下表为用户注册信息，存放用户的用户名密码等信息
             string sql = "CREATE TABLE IF NOT EXISTS `user` (`UserID` CHAR(10) NOT NULL,  `UserPSW` CHAR(10) NOT NULL, `Sex` CHAR(1) NOT NULL,`Adress` CHAR(50) NOT NULL,`Question` CHAR(50) NOT NULL,`Answer` CHAR(20) NOT NULL,`Phone` CHAR(11) NOT NULL,PRIMARY KEY(`UserID`)) DEFAULT CHARSET = utf8";
             ChangeMysql(sql);
+            //下表为play表，存储playdata
+            sql = "CREATE TABLE IF NOT EXISTS `player` (`UserID` CHAR(10) NOT NULL,  `data` BLOB ,PRIMARY KEY(`UserID`)) DEFAULT CHARSET = utf8";
+            ChangeMysql(sql);
+
         }
 
         private void ChangeMysql(string Mysql_change)//对数据库进行操作，通过其他函数传入的参数进行操作

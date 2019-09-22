@@ -40,10 +40,10 @@ public partial class HandleConnMsg
 		{
 			protocol.AddInt(-1);
 		}
-		//创建角色
-		DataMgr.instance.CreatePlayer (id);
-		//返回协议给客户端
-		conn.Send (protocol);
+        //创建角色
+        DataMgr.instance.CreatePlayer(id);
+        //返回协议给客户端
+        conn.Send (protocol);
 	}
 
 	//登录
@@ -89,6 +89,7 @@ public partial class HandleConnMsg
         }
         conn.player = new Player(id, conn);
         conn.player.data = playerData;
+        conn.player.tempData.rooms = RoomMgr.instance.GetPlayerTempDataRoom(id);
         //事件触发
         ServNet.instance.handlePlayerEvent.OnLogin(conn.player);
         //返回

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class PlayerTempData
 {
 	public PlayerTempData()
@@ -11,6 +13,7 @@ public class PlayerTempData
         Room,
     }
     public Status status;
+    public List<Room> rooms;//当前用户创建的房间
     public Room room;//当前用户进入的展厅
     //展厅相关
     public long lastUpdateTime;

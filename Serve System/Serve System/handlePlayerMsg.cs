@@ -94,6 +94,6 @@ public partial class HandlePlayerMsg
         protocolRet.AddInt(player.data.videocount);
         protocolRet.AddInt(player.data.modelcount);
         player.Send(protocolRet);
-        Console.WriteLine("MsgGetScore " + player.id);
+        Console.WriteLine("MsgGetAchieve " + player.id);
     }
 }

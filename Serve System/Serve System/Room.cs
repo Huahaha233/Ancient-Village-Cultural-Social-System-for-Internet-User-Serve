@@ -50,28 +50,41 @@ public class Room
 			list.Remove(id);
 		}
 	}
-    //删除房间
+    //删除房间中的资源
     public bool DeleteResoure(Player player,string ResoureName,string sort)
     {
-        Resoure resoure = new Resoure();
-        foreach (Resoure resoures in picture)
+        switch (sort)
         {
-            if (resoures.resourename == ResoureName)
+            case "图片":
+                return DeleteResoure(picture,ResoureName);
+            case "视频":
+                return DeleteResoure(video, ResoureName);
+            case "3D模型":
+                return DeleteResoure(model, ResoureName);
+        }
+        return false;
+    }
+    //删除房间中的资源
+    private bool DeleteResoure(List<Resoure> resoures,string ResoureName)
+    {
+        Resoure resoure = new Resoure();
+        foreach (Resoure r in resoures)
+        {
+            if (r.resourename == ResoureName)
             {
-                resoure = resoures;
+                resoure = r;
                 break;
             }
         }
         if (resoure != null)
         {
-            lock (picture)
+            lock (resoures)
             {
-                picture.Remove(resoure);
+                resoures.Remove(resoure);
                 return true;
             }
         }
         else return false;
-
     }
     //广播
     public void Broadcast(ProtocolBase protocol)

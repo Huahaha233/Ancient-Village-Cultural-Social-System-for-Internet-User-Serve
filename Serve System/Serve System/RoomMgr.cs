@@ -23,7 +23,7 @@ public class RoomMgr
             room.Author = player.id;//将创建房间的玩家的ID赋值给房间
             room.Name = RoomName;
             room.Ins = RoomIns;
-            player.data.rooms.Add(room);
+            player.tempData.rooms.Add(room);
 			list.Add(room);
 		}
 	}
@@ -44,7 +44,7 @@ public class RoomMgr
             lock (list)
             {
                 list.Remove(room);
-                player.data.rooms.Remove(room);
+                player.tempData.rooms.Remove(room);
                 return true;
             }
         }
@@ -91,14 +91,27 @@ public class RoomMgr
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("GetRoomInfo");
         //房间信息
-        protocol.AddString(list[index].Ins);//房间的简介
+        protocol.AddString(list[index-1].Ins);//房间的简介，这里需要减1，由于传入的值是从1开始的，而list从0开始
         return protocol;
     }
 
     //判断当前用户是否已创建房间
     public bool HaveRoom(Player player)
     {
-        if (player.data.rooms.Count!=0) return true;
+        if (player.tempData.rooms.Count!=0) return true;
         return false;
+    }
+
+    public List<Room> GetPlayerTempDataRoom(string id)
+    {
+        List<Room> rooms = new List<Room>();
+        foreach(Room room in list)
+        {
+            if(room.Author==id)
+            {
+                rooms.Add(room);
+            }
+        }
+        return rooms;
     }
 }

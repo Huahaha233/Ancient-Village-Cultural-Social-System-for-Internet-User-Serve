@@ -185,9 +185,10 @@ public class DataMgr
 		//写入数据库
 		string cmdStr = string.Format ("insert into player set UserID ='{0}' ,data =@data;",id);
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);
-		cmd.Parameters.Add ("@data", MySqlDbType.Blob);
-		cmd.Parameters[0].Value = byteArr;
-		try 
+        //cmd.Parameters.Add ("@data", MySqlDbType.Blob);
+        //cmd.Parameters[0].Value = byteArr;
+        cmd.Parameters.AddWithValue("@data", byteArr);
+        try 
 		{
 			cmd.ExecuteNonQuery ();
 			return true;
@@ -230,7 +231,7 @@ public class DataMgr
 		if (!IsSafeStr(id))
 			return playerData;
 		//查询
-		string cmdStr = string.Format("select * from player where id ='{0}';", id);
+		string cmdStr = string.Format("select * from player where UserID ='{0}';", id);
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn); 
 		byte[] buffer;
 		try
@@ -253,20 +254,20 @@ public class DataMgr
 			Console.WriteLine("[DataMgr]GetPlayerData 查询 " + e.Message);
 			return playerData;
 		}
-		//反序列化
-		MemoryStream stream = new MemoryStream(buffer); 
-		try 
-		{
-			BinaryFormatter formatter = new BinaryFormatter();
-			playerData = (PlayerData)formatter.Deserialize(stream);
-			return playerData;
-		}
-		catch (SerializationException e) 
-		{
-			Console.WriteLine("[DataMgr]GetPlayerData 反序列化 " + e.Message);
-			return playerData;
-		}
-	}
+        //反序列化
+        MemoryStream stream = new MemoryStream(buffer);
+        try
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            playerData = (PlayerData)formatter.Deserialize(stream);
+            return playerData;
+        }
+        catch (SerializationException e)
+        {
+            Console.WriteLine("[DataMgr]GetPlayerData 反序列化 " + e.Message);
+            return playerData;
+        }
+    }
 
 
 	//保存角色
