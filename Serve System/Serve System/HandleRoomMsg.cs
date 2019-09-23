@@ -189,8 +189,8 @@ public partial class HandlePlayerMsg
         float rotX = protocol.GetFloat(start, ref start);
         float rotY = protocol.GetFloat(start, ref start);
         float rotZ = protocol.GetFloat(start, ref start);
-        float gunRot = protocol.GetFloat(start, ref start);
-        float gunRoll = protocol.GetFloat(start, ref start);
+        //float gunRot = protocol.GetFloat(start, ref start);
+        //float gunRoll = protocol.GetFloat(start, ref start);
         //获取房间
         if (player.tempData.status != PlayerTempData.Status.Room)
             return;
@@ -199,6 +199,9 @@ public partial class HandlePlayerMsg
         player.tempData.posX = posX;
         player.tempData.posY = posY;
         player.tempData.posZ = posZ;
+        player.tempData.rotX = rotX;
+        player.tempData.rotY = rotY;
+        player.tempData.rotZ = rotZ;
         player.tempData.lastUpdateTime = Sys.GetTimeStamp();
         //广播
         ProtocolBytes protocolRet = new ProtocolBytes();
@@ -210,8 +213,8 @@ public partial class HandlePlayerMsg
         protocolRet.AddFloat(rotX);
         protocolRet.AddFloat(rotY);
         protocolRet.AddFloat(rotZ);
-        protocolRet.AddFloat(gunRot);
-        protocolRet.AddFloat(gunRoll);
+        //protocolRet.AddFloat(gunRot);
+        //protocolRet.AddFloat(gunRoll);
         room.Broadcast(protocolRet);
     }
 }

@@ -20,6 +20,7 @@ public class PlayerTempData
     public float posX;
     public float posY;
     public float posZ;
-    //public long lastShootTime;
-    //public float hp = 100;
+    public float rotX;
+    public float rotY;
+    public float rotZ;
 }
