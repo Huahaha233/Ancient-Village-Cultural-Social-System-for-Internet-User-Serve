@@ -22,7 +22,7 @@ public class ServNet
 	//主定时器
 	System.Timers.Timer timer = new System.Timers.Timer(1000);
 	//心跳时间
-	public long heartBeatTime = 180;
+	public long heartBeatTime = 10;
 	//协议
 	public ProtocolBase proto ;
 	//消息分发
@@ -260,7 +260,6 @@ public class ServNet
 	//心跳
 	public void HeartBeat()
 	{
-		//Console.WriteLine ("[主定时器执行]");
 		long timeNow = Sys.GetTimeStamp();
 		
 		for (int i = 0; i < conns.Length; i++)

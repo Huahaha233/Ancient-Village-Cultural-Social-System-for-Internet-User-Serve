@@ -10,12 +10,10 @@ public class HandlePlayerEvent
 	//下线
 	public void OnLogout(Player player)
 	{
-        if (player.tempData.status == PlayerTempData.Status.Room)
-        {
-            Room room = player.tempData.room;
-            RoomMgr.instance.LeaveRoom(player);
-            if (room != null)
-                room.Broadcast(RoomMgr.instance.GetRoomList());
-        }
+        Room room = player.tempData.room;
+        RoomMgr.instance.LeaveRoom(player);
+        if (room != null)
+            room.Broadcast(RoomMgr.instance.GetRoomList());
+        
     }
 }

@@ -6,7 +6,7 @@ public partial class HandleConnMsg
 	//协议参数：无
 	public void MsgHeatBeat(Conn conn, ProtocolBase protoBase)
 	{
-		conn.lastTickTime = Sys.GetTimeStamp();
+        conn.lastTickTime = Sys.GetTimeStamp();
 		Console.WriteLine("[更新心跳时间]" + conn.GetAdress());
 	}
 
@@ -70,9 +70,7 @@ public partial class HandleConnMsg
 			return;
 		}
 		//是否已经登录
-		ProtocolBytes protocolLogout = new ProtocolBytes ();
-		protocolLogout.AddString ("Logout");
-		if (!Player.KickOff (id, protocolLogout)) 
+		if (Player.KickOff (id)) 
 		{
 			protocolRet.AddInt(-1);
 			conn.Send (protocolRet);
@@ -103,19 +101,7 @@ public partial class HandleConnMsg
 	//返回协议：0-正常下线
 	public void MsgLogout(Conn conn, ProtocolBase protoBase)
 	{
-		ProtocolBytes protocol = new ProtocolBytes ();
-		protocol.AddString ("Logout");
-		protocol.AddInt (0);
-		if (conn.player == null) 
-		{
-			conn.Send (protocol);
-			conn.Close ();
-		}
-		else 
-		{
-			conn.Send (protocol);
-			conn.player.Logout();
-		}
+        conn.player.Logout();
 	}
     
     //忘记密码

@@ -38,7 +38,6 @@ public class Room
 		}
         return true;
 	}
-	
 	//删除玩家
 	public bool DelPlayer(string id)
 	{
@@ -46,7 +45,6 @@ public class Room
 		{
 			if (!list.ContainsKey(id))
 				return false;
-			list[id].tempData.status = PlayerTempData.Status.None;
 			list.Remove(id);
 		}
         return true;

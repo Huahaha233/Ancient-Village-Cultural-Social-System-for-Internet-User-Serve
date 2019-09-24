@@ -185,8 +185,6 @@ public class DataMgr
 		//写入数据库
 		string cmdStr = string.Format ("insert into player set UserID ='{0}' ,data =@data;",id);
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);
-        //cmd.Parameters.Add ("@data", MySqlDbType.Blob);
-        //cmd.Parameters[0].Value = byteArr;
         cmd.Parameters.AddWithValue("@data", byteArr);
         try 
 		{
@@ -288,13 +286,11 @@ public class DataMgr
 			return false;
 		}
 		byte[] byteArr = stream.ToArray();
-		//写入数据库
-		string formatStr = "update player set data =@data where id = '{0}';";
-	    string cmdStr = string.Format (formatStr , player.id);
+        //写入数据库
+        string cmdStr = string.Format("update player set data =@data where id = '{0}';", id);
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);
-		cmd.Parameters.Add ("@data", MySqlDbType.Blob);
-		cmd.Parameters[0].Value = byteArr;
-		try
+        cmd.Parameters.AddWithValue("@data", byteArr);
+        try
 		{
 			cmd.ExecuteNonQuery ();
 			return true;

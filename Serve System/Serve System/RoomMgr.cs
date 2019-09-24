@@ -55,11 +55,7 @@ public class RoomMgr
     public void LeaveRoom(Player player)
 	{
 		PlayerTempData tempdata = player.tempData;
-		if (player.tempData.status == PlayerTempData.Status.None)
-			return;
-		
 		Room room = tempdata.room;
-		
 		lock(list)
 		{
 			room.DelPlayer(player.id);

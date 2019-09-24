@@ -27,7 +27,6 @@ public partial class HandlePlayerMsg
         player.Send (protocolRet);
 		Console.WriteLine ("MsgGetData " + player.id);
 	}
-
 	//增加
 	//协议参数：
 	public void MsgAddData(Player player, ProtocolBase protoBase)
