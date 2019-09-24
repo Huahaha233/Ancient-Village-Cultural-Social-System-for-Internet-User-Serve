@@ -36,19 +36,38 @@ public class Room
 			string id = player.id;
 			list.Add(id, player);
 		}
-		return true;
+
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("AddPlayer");
+        protocol.AddString(player.id);
+        protocol.AddFloat(player.tempData.posX);
+        protocol.AddFloat(player.tempData.posY);
+        protocol.AddFloat(player.tempData.posZ);
+        protocol.AddFloat(player.tempData.rotX);
+        protocol.AddFloat(player.tempData.rotY);
+        protocol.AddFloat(player.tempData.rotZ);
+        Broadcast(protocol);
+
+        return true;
 	}
 	
 	//删除玩家
-	public void DelPlayer(string id)
+	public bool DelPlayer(string id)
 	{
 		lock (list) 
 		{
 			if (!list.ContainsKey(id))
-				return;
+				return false;
 			list[id].tempData.status = PlayerTempData.Status.None;
 			list.Remove(id);
 		}
+
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("DelPlayer");
+        protocol.AddString(id);
+        Broadcast(protocol);
+
+        return true;
 	}
     //删除房间中的资源
     public bool DeleteResoure(Player player,string ResoureName,string sort)
@@ -96,7 +115,7 @@ public class Room
 	}
 
     //开始浏览
-    public void StartVisit()
+    public ProtocolBytes StartVisit()
     {
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("StartVisit");
@@ -113,7 +132,7 @@ public class Room
                 protocol.AddFloat(p.tempData.rotY);
                 protocol.AddFloat(p.tempData.rotZ);
             }
-            Broadcast(protocol);
+            return protocol;
         }
     }
 }
