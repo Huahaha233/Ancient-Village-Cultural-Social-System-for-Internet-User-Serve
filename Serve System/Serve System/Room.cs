@@ -36,18 +36,6 @@ public class Room
 			string id = player.id;
 			list.Add(id, player);
 		}
-
-        ProtocolBytes protocol = new ProtocolBytes();
-        protocol.AddString("AddPlayer");
-        protocol.AddString(player.id);
-        protocol.AddFloat(player.tempData.posX);
-        protocol.AddFloat(player.tempData.posY);
-        protocol.AddFloat(player.tempData.posZ);
-        protocol.AddFloat(player.tempData.rotX);
-        protocol.AddFloat(player.tempData.rotY);
-        protocol.AddFloat(player.tempData.rotZ);
-        Broadcast(protocol);
-
         return true;
 	}
 	
@@ -61,12 +49,6 @@ public class Room
 			list[id].tempData.status = PlayerTempData.Status.None;
 			list.Remove(id);
 		}
-
-        ProtocolBytes protocol = new ProtocolBytes();
-        protocol.AddString("DelPlayer");
-        protocol.AddString(id);
-        Broadcast(protocol);
-
         return true;
 	}
     //删除房间中的资源

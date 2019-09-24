@@ -101,7 +101,18 @@ public partial class HandlePlayerMsg
 			protocol.AddInt(-1);
 			player.Send (protocol);
 		}
-	}
+        //在场景中添加player预制体
+        ProtocolBytes proto = new ProtocolBytes();
+        proto.AddString("AddPlayer");
+        proto.AddString(player.id);
+        proto.AddFloat(player.tempData.posX);
+        proto.AddFloat(player.tempData.posY);
+        proto.AddFloat(player.tempData.posZ);
+        proto.AddFloat(player.tempData.rotX);
+        proto.AddFloat(player.tempData.rotY);
+        proto.AddFloat(player.tempData.rotZ);
+        room.Broadcast(proto);
+    }
 
     //获取房间信息
     public void MsgGetRoomInfo(Player player, ProtocolBase protoBase)
@@ -133,10 +144,18 @@ public partial class HandlePlayerMsg
 		player.Send (protocol);
 		Room room = player.tempData.room;
 		RoomMgr.instance.LeaveRoom (player);
-		//广播
-		if(room != null)
-			room.Broadcast(RoomMgr.instance.GetRoomList());
-	}
+        //广播
+        if (room != null)
+        {
+            room.Broadcast(RoomMgr.instance.GetRoomList());
+            //在场景中删除player预制体
+            ProtocolBytes proto = new ProtocolBytes();
+            proto.AddString("DelPlayer");
+            proto.AddString(player.id);
+            room.Broadcast(proto);
+        }
+
+    }
 
     //删除房间
     public void MsgDeleteRoom(Player player, ProtocolBase protoBase)
