@@ -8,10 +8,7 @@ public class Room
 	//状态
 	public enum Status
 	{
-		//Prepare = 1,
-		//Visit = 2 ,
 	}
-	//public Status status = Status.Prepare;
 	//玩家
 	public int maxPlayers = 10;
     public string Name;//房间的名称
@@ -19,9 +16,9 @@ public class Room
     public string Author;//房间的创建者
 
 	public Dictionary<string,Player> list = new Dictionary<string,Player>();
-    public List<Resoure> picture = new List<Resoure>();
-    public List<Resoure> video = new List<Resoure>();
-    public List<Resoure> model = new List<Resoure>();
+    public Dictionary<string, Resoure> picture = new Dictionary<string, Resoure>();
+    public Dictionary<string, Resoure> video = new Dictionary<string, Resoure>();
+    public Dictionary<string, Resoure> model = new Dictionary<string, Resoure>();
     //添加玩家
     public bool AddPlayer(Player player)
 	{
@@ -55,36 +52,42 @@ public class Room
         switch (sort)
         {
             case "图片":
-                return DeleteResoure(picture,ResoureName);
+                if (picture.ContainsKey(ResoureName))
+                {
+                    lock (picture)
+                    {
+                        picture.Remove(ResoureName);
+                        player.data.picturecount--;
+                        return true;
+                    }
+                }
+                return false;
             case "视频":
-                return DeleteResoure(video, ResoureName);
+                if (video.ContainsKey(ResoureName))
+                {
+                    lock (video)
+                    {
+                        video.Remove(ResoureName);
+                        player.data.picturecount--;
+                        return true;
+                    }
+                }
+                return false;
             case "3D模型":
-                return DeleteResoure(model, ResoureName);
+                if (model.ContainsKey(ResoureName))
+                {
+                    lock (model)
+                    {
+                        model.Remove(ResoureName);
+                        player.data.picturecount--;
+                        return true;
+                    }
+                }
+                return false;
         }
         return false;
     }
-    //删除房间中的资源
-    private bool DeleteResoure(List<Resoure> resoures,string ResoureName)
-    {
-        Resoure resoure = new Resoure();
-        foreach (Resoure r in resoures)
-        {
-            if (r.resourename == ResoureName)
-            {
-                resoure = r;
-                break;
-            }
-        }
-        if (resoure != null)
-        {
-            lock (resoures)
-            {
-                resoures.Remove(resoure);
-                return true;
-            }
-        }
-        else return false;
-    }
+    
     //广播
     public void Broadcast(ProtocolBase protocol)
 	{
@@ -93,7 +96,20 @@ public class Room
 			player.Send(protocol);
 		}
 	}
-
+    //判断资源类型
+    public Dictionary<string, Resoure> JudegeSort(string sort)
+    {
+        switch (sort)
+        {
+            case "picture":
+                return picture;
+            case "video":
+                return video;
+            case "model":
+                return model;
+        }
+        return null;
+    }
     //开始浏览
     public ProtocolBytes StartVisit()
     {

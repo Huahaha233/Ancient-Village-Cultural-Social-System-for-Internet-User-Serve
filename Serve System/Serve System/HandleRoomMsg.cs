@@ -37,33 +37,53 @@ public partial class HandlePlayerMsg
 		Console.WriteLine ("MsgCreateRoom Ok " + player.id);
 	}
 
+    //获取该用户的所有房间名称
+    public void MsgGetRoomNameList(Player player, ProtocolBase protoBase)
+    {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("GetRoomNameList");
+        protocol.AddInt(RoomMgr.instance.list.Count);
+        foreach(string name in RoomMgr.instance.list.Keys)
+        {
+            protocol.AddString(name);
+        }
+        player.Send(protocol);
+    }
+
     //获取用户选择房间的全部资源信息
     public void MsgGetResoureList(Player player, ProtocolBase protoBase)
     {
-        ProtocolBytes protocol = new ProtocolBytes();
-        protocol.AddString("GetResoureList");
-        protocol.AddInt(player.tempData.rooms.Count);
-        for(int i=0;i< player.tempData.rooms.Count; i++)
+        //先获得房间的名称
+        ProtocolBytes protocol = (ProtocolBytes)protoBase;
+        int start = 0;
+        string protoName = protocol.GetString(start,ref start);
+        string RoomName = protocol.GetString(start,ref start);
+        ProtocolBytes protoRet = new ProtocolBytes();
+        protoRet.AddString("GetResoureList");
+        if (!RoomMgr.instance.list.ContainsKey(RoomName))
         {
-            protocol.AddString(player.tempData.rooms[i].Name);
-            protocol.AddInt(player.data.picturecount+player.data.videocount+player.data.modelcount);
-            for(int p=0;p< player.data.picturecount; p++)
-            {
-                protocol.AddString(player.tempData.rooms[i].picture[p].resourename);
-                protocol.AddString(player.tempData.rooms[i].picture[p].resouresourt);
-            }
-            for (int v = 0; v < player.data.picturecount; v++)
-            {
-                protocol.AddString(player.tempData.rooms[i].video[v].resourename);
-                protocol.AddString(player.tempData.rooms[i].video[v].resouresourt);
-            }
-            for (int m = 0; m < player.data.picturecount; m++)
-            {
-                protocol.AddString(player.tempData.rooms[i].model[m].resourename);
-                protocol.AddString(player.tempData.rooms[i].model[m].resouresourt);
-            }
+            protoRet.AddInt(-1);
+            player.Send(protoRet);
+            return;
         }
-        player.Send(protocol);
+        Room room = RoomMgr.instance.list[RoomName];
+        protocol.AddInt(room.picture.Count+room.video.Count+room.model.Count);
+        foreach(string p in room.picture.Keys)
+        {
+            protoRet.AddString(p);
+            protoRet.AddString("picture");
+        }
+        foreach (string v in room.video.Keys)
+        {
+            protoRet.AddString(v);
+            protoRet.AddString("video");
+        }
+        foreach (string m in room.model.Keys)
+        {
+            protoRet.AddString(m);
+            protoRet.AddString("model");
+        }
+        player.Send(protoRet);
         Console.WriteLine("MsgGetResoureList Ok " + player.id);
     }
 
@@ -74,20 +94,19 @@ public partial class HandlePlayerMsg
 		int start = 0;
 		ProtocolBytes protocol = (ProtocolBytes)protoBase;
 		string protoName = protocol.GetString (start, ref start);
-		int index = protocol.GetInt (start, ref start)-1; //这里需要减1，由于传入的值是从1开始的，而list从0开始
-        Console.WriteLine ("[收到MsgEnterRoom]" + player.id + " " + index);
+		string Name = protocol.GetString (start, ref start); //这里需要减1，由于传入的值是从1开始的，而list从0开始
+        Console.WriteLine ("[收到MsgEnterRoom]" + player.id + " " + Name);
 		protocol = new ProtocolBytes ();
 		protocol.AddString ("EnterRoom");
 		//判断房间是否存在
-		if (index < 0 || index >= RoomMgr.instance.list.Count) 
+		if (!RoomMgr.instance.list.ContainsKey(Name)) 
 		{
 			Console.WriteLine ("MsgEnterRoom index err " + player.id);
 			protocol.AddInt(-1);
 			player.Send (protocol);
 			return;
 		}
-		Room room = RoomMgr.instance.list[index];
-
+		Room room = RoomMgr.instance.list[Name];
 		//添加玩家
 		if (room.AddPlayer (player))
 		{
@@ -120,8 +139,8 @@ public partial class HandlePlayerMsg
         int start = 0;
         ProtocolBytes protocol = (ProtocolBytes)protoBase;
         string protoName = protocol.GetString(start, ref start);
-        int index = protocol.GetInt(start, ref start);//房间序号
-        player.Send(RoomMgr.instance.GetRoomInfo(index));
+        string name = protocol.GetString(start, ref start);//房间名称
+        player.Send(RoomMgr.instance.GetRoomInfo(name));
 	}
 
     //离开房间
@@ -169,7 +188,45 @@ public partial class HandlePlayerMsg
         if (RoomMgr.instance.DeleteRoom(player, roomname)) proto.AddInt(0);
             else proto.AddInt(-1);
         player.Send(proto);
-        //广播
+    }
+
+    //增加资源
+    //协议参数：
+    public void MsgAddResoure(Player player, ProtocolBase protoBase)
+    {
+        //获取数值
+        int start = 0;
+        ProtocolBytes protocol = (ProtocolBytes)protoBase;
+        string protoName = protocol.GetString(start, ref start);
+        string RoomName = protocol.GetString(start, ref start);
+        string ResoureName = protocol.GetString(start, ref start);
+        string ResoureIns = protocol.GetString(start, ref start);
+        string ResoureSort = protocol.GetString(start, ref start);
+        //判断
+        Room room = RoomMgr.instance.list[RoomName];
+        Resoure resoure = new Resoure();
+        resoure.resourename = ResoureName;
+        resoure.resoureins = ResoureIns;
+        resoure.resouresort = ResoureSort;
+        resoure.resourebytes = protocol.GetByte(start, ref start);
+        switch (ResoureSort)
+        {
+            case "picture":
+                room.picture.Add(ResoureName,resoure);
+                player.data.picturecount++;
+                break;
+            case "video":
+                room.video.Add(ResoureName, resoure);
+                player.data.videocount++;
+                break;
+            case "model":
+                room.model.Add(ResoureName, resoure);
+                player.data.modelcount++;
+                break;
+        }
+        //处理
+        Console.WriteLine("MsgAddResoure " + player.id);
+
     }
 
     //删除资源
@@ -183,16 +240,9 @@ public partial class HandlePlayerMsg
         string sort = protocol.GetString(start, ref start);//类型名称
         ProtocolBytes proto = new ProtocolBytes();
         proto.AddString("DeleteResoure");
-        foreach(Room room in player.tempData.rooms)
-        {
-            if(room.Name==roomname)
-            {
-                if(room.DeleteResoure(player, resourename, sort))proto.AddInt(0);
-                else proto.AddInt(-1);
-                player.Send(proto);
-            }
-        }
-        //广播
+        if(RoomMgr.instance.list[roomname].DeleteResoure(player, resourename, sort))proto.AddInt(0);
+            else proto.AddInt(-1);
+        player.Send(proto);
     }
 
     //同步用户

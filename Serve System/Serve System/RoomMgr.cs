@@ -12,8 +12,7 @@ public class RoomMgr
 	}
 	
 	//房间列表
-	public List<Room> list = new List<Room>();
-
+    public Dictionary<string, Room> list = new Dictionary<string, Room>();
 	//创建房间
 	public void CreateRoom(Player player,string RoomName,string RoomIns)
 	{
@@ -23,28 +22,17 @@ public class RoomMgr
             room.Author = player.id;//将创建房间的玩家的ID赋值给房间
             room.Name = RoomName;
             room.Ins = RoomIns;
-            player.tempData.rooms.Add(room);
-			list.Add(room);
+			list.Add(RoomName,room);
 		}
 	}
     //删除房间
     public bool DeleteRoom(Player player, string RoomName)
     {
-        Room room = new Room();
-        foreach(Room rooms in list)
-        {
-            if (rooms.Name == RoomName)
-            {
-                room = rooms;
-                break;
-            }
-        }
-        if (room != null)
+        if (list.Keys.Contains(RoomName))
         {
             lock (list)
             {
-                list.Remove(room);
-                player.tempData.rooms.Remove(room);
+                list.Remove(RoomName);
                 return true;
             }
         }
@@ -71,9 +59,8 @@ public class RoomMgr
 		//房间数量
 		protocol.AddInt (count);
 		//每个房间信息
-		for (int i=0; i<count; i++) 
+		foreach(Room room in list.Values)
 		{
-			Room room = list[i];
             protocol.AddString(room.Name); 
 			protocol.AddInt(room.list.Count);//房间中的人数
             protocol.AddString(room.Author);
@@ -82,32 +69,23 @@ public class RoomMgr
 	}
 
     //获取房间信息
-    public ProtocolBytes GetRoomInfo(int index)
+    public ProtocolBytes GetRoomInfo(string name)
     {
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("GetRoomInfo");
         //房间信息
-        protocol.AddString(list[index-1].Ins);//房间的简介，这里需要减1，由于传入的值是从1开始的，而list从0开始
+        protocol.AddString(list[name].Ins);//房间的简介，这里需要减1，由于传入的值是从1开始的，而list从0开始
         return protocol;
     }
 
     //判断当前用户是否已创建房间
     public bool HaveRoom(Player player)
     {
-        if (player.tempData.rooms.Count!=0) return true;
+        foreach(Room room in list.Values)
+        {
+            if(room.Author==player.id)return true;
+        }
         return false;
     }
-
-    public List<Room> GetPlayerTempDataRoom(string id)
-    {
-        List<Room> rooms = new List<Room>();
-        foreach(Room room in list)
-        {
-            if(room.Author==id)
-            {
-                rooms.Add(room);
-            }
-        }
-        return rooms;
-    }
+    
 }

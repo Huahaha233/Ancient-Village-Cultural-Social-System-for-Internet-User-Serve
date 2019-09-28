@@ -87,7 +87,6 @@ public partial class HandleConnMsg
         }
         conn.player = new Player(id, conn);
         conn.player.data = playerData;
-        conn.player.tempData.rooms = RoomMgr.instance.GetPlayerTempDataRoom(id);
         //事件触发
         ServNet.instance.handlePlayerEvent.OnLogin(conn.player);
         //返回
