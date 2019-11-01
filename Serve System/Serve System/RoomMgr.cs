@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq; 
+using System.Linq;
+using Serve_System;
 
 public class RoomMgr
 {
@@ -33,6 +34,8 @@ public class RoomMgr
             lock (list)
             {
                 list.Remove(RoomName);
+                IHandleMysql handleMysql = new HandleMysql();
+                handleMysql.deleteMySQL("delete from roomchat where RoomName = "+RoomName);
                 return true;
             }
         }
@@ -47,8 +50,18 @@ public class RoomMgr
 		lock(list)
 		{
 			room.DelPlayer(player.id);
+            player.tempData.room = null;
 		}
-	}
+        //广播
+        if (room != null)
+        {
+            //在场景中删除player预制体
+            ProtocolBytes proto = new ProtocolBytes();
+            proto.AddString("DelPlayer");
+            proto.AddString(player.id);
+            room.Broadcast(proto);
+        }
+    }
 
 	//列表
 	public ProtocolBytes GetRoomList()
@@ -87,5 +100,30 @@ public class RoomMgr
         }
         return false;
     }
-    
+    //获取当前用户所拥有的房间名称
+    public List<string> GetPlayerRoom(Player player)
+    {
+        List<string> namelist = new List<string>();
+        foreach(string name in list.Keys)
+        {
+            if (list[name].Author == player.id) namelist.Add(name);
+        }
+        return namelist;
+    }
+    //刷新用户的基本资料
+    public void ReFlashPlayData(Player player,string sort,int index)
+    {
+        switch (sort)
+        {
+            case "picture":
+                player.data.picturecount += index;
+                break;
+            case "video":
+                player.data.picturecount += index;
+                break;
+            case "mdoel":
+                player.data.picturecount += index;
+                break;
+        }
+    }
 }

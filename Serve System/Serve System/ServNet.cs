@@ -22,7 +22,7 @@ public class ServNet
 	//主定时器
 	System.Timers.Timer timer = new System.Timers.Timer(1000);
 	//心跳时间
-	public long heartBeatTime = 10;
+	public long heartBeatTime = 120;
 	//协议
 	public ProtocolBase proto ;
 	//消息分发
@@ -271,6 +271,8 @@ public class ServNet
 			if(conn.lastTickTime < timeNow - heartBeatTime)
 			{
 				Console.WriteLine("[心跳引起断开连接]" + conn.GetAdress());
+                //断连后删除房间中的玩家
+                RoomMgr.instance.LeaveRoom(conn.player);
 				lock(conn)
 					conn.Close();
 			}

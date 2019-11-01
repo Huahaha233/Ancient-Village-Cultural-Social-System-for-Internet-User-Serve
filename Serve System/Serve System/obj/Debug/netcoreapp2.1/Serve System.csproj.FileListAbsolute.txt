@@ -9,3 +9,14 @@ F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-
 F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.pdb
 F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.dll
 F:\Unity_Graduation Project\Ancient-Village-Cultural-Social-System-for-Internet-User-Serve\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.pdb
+C:\Users\Administrator\Desktop\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.deps.json
+C:\Users\Administrator\Desktop\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.runtimeconfig.json
+C:\Users\Administrator\Desktop\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.runtimeconfig.dev.json
+C:\Users\Administrator\Desktop\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.dll
+C:\Users\Administrator\Desktop\Serve System\Serve System\bin\Debug\netcoreapp2.1\Serve System.pdb
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.dll
+C:\Users\Administrator\Desktop\Serve System\Serve System\obj\Debug\netcoreapp2.1\Serve System.pdb

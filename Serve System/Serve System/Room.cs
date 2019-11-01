@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq; 
+using System.IO;
+using System.Linq;
+using Serve_System;
 
 //房间
 public class Room
@@ -16,22 +18,20 @@ public class Room
     public string Author;//房间的创建者
 
 	public Dictionary<string,Player> list = new Dictionary<string,Player>();
-    public Dictionary<string, Resoure> picture = new Dictionary<string, Resoure>();
-    public Dictionary<string, Resoure> video = new Dictionary<string, Resoure>();
-    public Dictionary<string, Resoure> model = new Dictionary<string, Resoure>();
+    public Dictionary<string, Resoure> resouredata = new Dictionary<string, Resoure>();
     //添加玩家
     public bool AddPlayer(Player player)
 	{
 		lock (list) 
 		{
-			if (list.Count >= maxPlayers)
+			if (list.Count >= maxPlayers||list.ContainsKey(player.id))
 				return false;
 			PlayerTempData tempdata = player.tempData;
             tempdata.room = this; 
 			player.tempData.status = PlayerTempData.Status.Room;
-
 			string id = player.id;
 			list.Add(id, player);
+            Console.WriteLine("AddPlayer"+id);
 		}
         return true;
 	}
@@ -49,41 +49,15 @@ public class Room
     //删除房间中的资源
     public bool DeleteResoure(Player player,string ResoureName,string sort)
     {
-        switch (sort)
+        if (resouredata.ContainsKey(ResoureName))
         {
-            case "图片":
-                if (picture.ContainsKey(ResoureName))
-                {
-                    lock (picture)
-                    {
-                        picture.Remove(ResoureName);
-                        player.data.picturecount--;
-                        return true;
-                    }
-                }
-                return false;
-            case "视频":
-                if (video.ContainsKey(ResoureName))
-                {
-                    lock (video)
-                    {
-                        video.Remove(ResoureName);
-                        player.data.picturecount--;
-                        return true;
-                    }
-                }
-                return false;
-            case "3D模型":
-                if (model.ContainsKey(ResoureName))
-                {
-                    lock (model)
-                    {
-                        model.Remove(ResoureName);
-                        player.data.picturecount--;
-                        return true;
-                    }
-                }
-                return false;
+            lock (resouredata)
+            {
+                File.Delete(@"C:"+resouredata[ResoureName].resoureadress);
+                resouredata.Remove(ResoureName);
+                RoomMgr.instance.ReFlashPlayData(player,sort,-1);
+                return true;
+            }
         }
         return false;
     }
@@ -96,20 +70,7 @@ public class Room
 			player.Send(protocol);
 		}
 	}
-    //判断资源类型
-    public Dictionary<string, Resoure> JudegeSort(string sort)
-    {
-        switch (sort)
-        {
-            case "picture":
-                return picture;
-            case "video":
-                return video;
-            case "model":
-                return model;
-        }
-        return null;
-    }
+    
     //开始浏览
     public ProtocolBytes StartVisit()
     {
@@ -130,5 +91,20 @@ public class Room
             }
             return protocol;
         }
+    }
+
+    //增添房间的留言
+    public void AddChatMessgae(string id,string message)
+    {
+        IHandleMysql handleMysql = new HandleMysql();
+        string nowtime = DateTime.Now.Year + "." + DateTime.Now.Month + "." + DateTime.Now.Day + "-" + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
+        handleMysql.insertMySQL("insert into roomchat(ChatId,RoomName,PlayerId,ChatMessage,ChatTime) values(NULL,'"+Name+"', '"+id+"', '"+message+"', '"+nowtime+"')"); //插入数据到表);
+    }
+    //增添房间的留言
+    public Dictionary<string,string> GetChatMessgae()
+    {
+        IHandleMysql handleMysql = new HandleMysql();
+        string nowtime = DateTime.Now.Year + "." + DateTime.Now.Month + "." + DateTime.Now.Day + "-" + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
+        return handleMysql.selectMySQL("select * from roomchat",Name); //插入数据到表);
     }
 }

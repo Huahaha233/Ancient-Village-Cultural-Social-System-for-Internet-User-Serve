@@ -10,52 +10,19 @@ public partial class HandlePlayerMsg
 		ProtocolBytes protocolRet = new ProtocolBytes ();
 		protocolRet.AddString ("GetResoure");
         Room room = player.tempData.room;
-        protocolRet.AddInt(room.picture.Count);
-        foreach(Resoure resoure in room.picture.Values)
+        protocolRet.AddInt(room.resouredata.Count);
+        foreach(string resoure in room.resouredata.Keys)
         {
-            protocolRet.AddByte(resoure.resourebytes);
-        }
-        protocolRet.AddInt(room.video.Count);
-        foreach (Resoure resoure in room.video.Values)
-        {
-            protocolRet.AddByte(resoure.resourebytes);
-        }
-        protocolRet.AddInt(room.model.Count);
-        foreach (Resoure resoure in room.model.Values)
-        {
-            protocolRet.AddByte(resoure.resourebytes);
+            protocolRet.AddString(room.resouredata[resoure].resourename);
+            protocolRet.AddString(room.resouredata[resoure].resoureins);
+            protocolRet.AddString(room.resouredata[resoure].resouresort);
+            protocolRet.AddString(room.resouredata[resoure].resoureadress);
         }
         player.Send (protocolRet);
 		Console.WriteLine ("MsgGetResoure " + player.id);
 	}
 	
-    //获取玩家列表
-    public void MsgGetList(Player player, ProtocolBase protoBase)
-    {
-        Scene.instance.SendPlayerList(player);
-    }
-
-    //更新信息
-    public void MsgUpdateInfo(Player player, ProtocolBase protoBase)
-    {
-        //获取数值
-        int start = 0;
-        ProtocolBytes protocol = (ProtocolBytes)protoBase;
-        string protoName = protocol.GetString(start, ref start);
-        float x = protocol.GetFloat(start, ref start);
-        float y = protocol.GetFloat(start, ref start);
-        float z = protocol.GetFloat(start, ref start);
-        Scene.instance.UpdateInfo(player.id, x, y, z);
-        //广播
-        ProtocolBytes protocolRet = new ProtocolBytes();
-        protocolRet.AddString("UpdateInfo");
-        protocolRet.AddString(player.id);
-        protocolRet.AddFloat(x);
-        protocolRet.AddFloat(y);
-        protocolRet.AddFloat(z);
-        ServNet.instance.Broadcast(protocolRet);
-    }
-
+    
     //获取玩家信息
     public void MsgGetAchieve(Player player, ProtocolBase protoBase)
     {

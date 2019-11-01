@@ -46,7 +46,9 @@ namespace Serv
             //下表为play表，存储playdata
             sql = "CREATE TABLE IF NOT EXISTS `player` (`UserID` CHAR(10) NOT NULL,  `data` BLOB ,PRIMARY KEY(`UserID`)) DEFAULT CHARSET = utf8";
             ChangeMysql(sql);
-
+            //下表为chat表，存储房间内的聊天记录
+            sql = "CREATE TABLE IF NOT EXISTS `roomchat` (`ChatId` INT UNSIGNED AUTO_INCREMENT,`RoomName` CHAR(10) NOT NULL,`PlayerId` CHAR(10) NOT NULL,`ChatMessage` CHAR(200) NOT NULL ,`ChatTime` CHAR(20) NOT NULL ,PRIMARY KEY(`ChatId`)) DEFAULT CHARSET = utf8";
+            ChangeMysql(sql);
         }
 
         private void ChangeMysql(string Mysql_change)//对数据库进行操作，通过其他函数传入的参数进行操作

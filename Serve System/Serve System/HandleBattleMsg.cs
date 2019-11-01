@@ -9,5 +9,4 @@ public partial class HandlePlayerMsg
         Room room = player.tempData.room;
         player.Send(room.StartVisit());
     }
-
 }
