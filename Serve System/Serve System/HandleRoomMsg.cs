@@ -1,12 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 public partial class HandlePlayerMsg
 {
 	//获取房间列表
 	public void MsgGetRoomList(Player player, ProtocolBase protoBase)
 	{
-		player.Send (RoomMgr.instance.GetRoomList());
+        //获取数值
+        int start = 0;
+        ProtocolBytes proto = (ProtocolBytes)protoBase;
+        string protoName = proto.GetString(start, ref start);
+        player.tempData.mapadress = proto.GetString(start, ref start);
+        player.Send (RoomMgr.instance.GetRoomList(player));
     }
 
     //判断用户是否含有已创建的房间
@@ -28,10 +35,11 @@ public partial class HandlePlayerMsg
         ProtocolBytes proto = (ProtocolBytes)protoBase;
         string protoName = proto.GetString(start, ref start);
         string RoomName = proto.GetString(start, ref start);
+        string RoomAdress = proto.GetString(start, ref start);
         string RoomIns = proto.GetString(start, ref start);
         ProtocolBytes protocol = new ProtocolBytes ();
 		protocol.AddString ("CreateRoom");
-		RoomMgr.instance.CreateRoom (player,RoomName,RoomIns);
+		RoomMgr.instance.CreateRoom (player,RoomName,RoomAdress,RoomIns);
 		protocol.AddInt(0);
 		player.Send (protocol);
 		Console.WriteLine ("MsgCreateRoom Ok " + player.id);
@@ -102,7 +110,7 @@ public partial class HandlePlayerMsg
 		//添加玩家
 		if (room.AddPlayer (player))
 		{
-			room.Broadcast(RoomMgr.instance.GetRoomList());
+			room.Broadcast(RoomMgr.instance.GetRoomList(player));
 			protocol.AddInt(0);
 			player.Send (protocol);
 		}
@@ -206,13 +214,28 @@ public partial class HandlePlayerMsg
         resoure.resouresort = ResoureSort;
         resoure.resoureadress = ResoureAdress;
         room.resouredata.Add(ResoureName,resoure);
+        player.tempData.tempadress = ResoureAdress;
         RoomMgr.instance.ReFlashPlayData(player, ResoureSort, 1);
         //处理
         protocolRet.AddInt(0);
+        protocolRet.AddString(ResoureAdress);
         player.Send(protocolRet);
         Console.WriteLine("MsgAddResoure " + player.id);
+        //判断资源是否上传完成        
+        Thread t = new Thread(new ParameterizedThreadStart(Judge));
+        t.Start(player);
     }
-
+    private void Judge(object obj)
+    {
+        ProtocolBytes protocolRet = new ProtocolBytes();
+        protocolRet.AddString("UpLoadCompleted");
+        Player player = (Player)obj;
+        while (!File.Exists(@"C:" + player.tempData.tempadress))
+        {
+            Thread.Sleep(2000);//休眠
+        }
+        player.Send(protocolRet);
+    }
     //删除资源
     public void MsgDeleteResoure(Player player, ProtocolBase protoBase)
     {
@@ -267,7 +290,12 @@ public partial class HandlePlayerMsg
         protocolRet.AddFloat(rotX);
         protocolRet.AddFloat(rotY);
         protocolRet.AddFloat(rotZ);
-        room.Broadcast(protocolRet);
+        try
+        {
+            room.Broadcast(protocolRet);
+        }
+        catch
+        { }
     }
 
     //增加房间留言
@@ -302,6 +330,11 @@ public partial class HandlePlayerMsg
             protocolRet.AddString(key);
             protocolRet.AddString(chat[key]);
         }
-        player.Send(protocolRet);
+        try
+        {
+            player.Send(protocolRet);
+        }
+        catch
+        { }
     }
 }

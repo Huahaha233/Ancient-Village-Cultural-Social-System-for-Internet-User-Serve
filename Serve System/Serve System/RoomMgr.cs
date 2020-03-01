@@ -15,15 +15,20 @@ public class RoomMgr
 	//房间列表
     public Dictionary<string, Room> list = new Dictionary<string, Room>();
 	//创建房间
-	public void CreateRoom(Player player,string RoomName,string RoomIns)
+	public void CreateRoom(Player player,string RoomName,string RoomAdress,string RoomIns)
 	{
 		Room room = new Room ();
 		lock (list) 
 		{
             room.Author = player.id;//将创建房间的玩家的ID赋值给房间
             room.Name = RoomName;
+            room.Adress = RoomAdress;
             room.Ins = RoomIns;
-			list.Add(RoomName,room);
+            try
+            {
+                list.Add(RoomName,room);
+            }
+            catch { }
 		}
 	}
     //删除房间
@@ -49,7 +54,11 @@ public class RoomMgr
 		Room room = tempdata.room;
 		lock(list)
 		{
-			room.DelPlayer(player.id);
+            try
+            {
+                room.DelPlayer(player.id);
+            }
+            catch { }
             player.tempData.room = null;
 		}
         //广播
@@ -64,9 +73,9 @@ public class RoomMgr
     }
 
 	//列表
-	public ProtocolBytes GetRoomList()
+	public ProtocolBytes GetRoomList(Player player)
 	{
-		ProtocolBytes protocol = new ProtocolBytes ();
+        ProtocolBytes protocol = new ProtocolBytes ();
 		protocol.AddString ("GetRoomList");
 		int count = list.Count;
 		//房间数量
@@ -74,13 +83,15 @@ public class RoomMgr
 		//每个房间信息
 		foreach(Room room in list.Values)
 		{
-            protocol.AddString(room.Name); 
-			protocol.AddInt(room.list.Count);//房间中的人数
-            protocol.AddString(room.Author);
+            if (player.tempData.mapadress == room.Adress)
+            {
+                protocol.AddString(room.Name);
+                protocol.AddInt(room.list.Count);//房间中的人数
+                protocol.AddString(room.Author);
+            }
         }
 		return protocol;
 	}
-
     //获取房间信息
     public ProtocolBytes GetRoomInfo(string name)
     {
@@ -119,10 +130,10 @@ public class RoomMgr
                 player.data.picturecount += index;
                 break;
             case "video":
-                player.data.picturecount += index;
+                player.data.videocount += index;
                 break;
             case "mdoel":
-                player.data.picturecount += index;
+                player.data.modelcount += index;
                 break;
         }
     }

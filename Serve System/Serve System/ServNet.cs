@@ -153,7 +153,7 @@ public class ServNet
 				                         conn.buffCount, conn.BuffRemain(), 
 				                         SocketFlags.None, ReceiveCb, conn);
 			} 
-			catch(Exception e)
+			catch
 			{
 				Console.WriteLine("收到 [" + conn.GetAdress()　+"] 断开链接");
 				conn.Close();

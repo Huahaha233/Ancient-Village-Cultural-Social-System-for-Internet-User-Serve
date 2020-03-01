@@ -15,6 +15,7 @@ public class Room
 	public int maxPlayers = 10;
     public string Name;//房间的名称
     public string Ins;//房间的简介
+    public string Adress;//房间的地址
     public string Author;//房间的创建者
 
 	public Dictionary<string,Player> list = new Dictionary<string,Player>();
@@ -67,7 +68,11 @@ public class Room
 	{
 		foreach(Player player in list.Values)
 		{
-			player.Send(protocol);
+            try
+            {
+                player.Send(protocol);
+            }
+            catch { }
 		}
 	}
     
@@ -104,7 +109,6 @@ public class Room
     public Dictionary<string,string> GetChatMessgae()
     {
         IHandleMysql handleMysql = new HandleMysql();
-        string nowtime = DateTime.Now.Year + "." + DateTime.Now.Month + "." + DateTime.Now.Day + "-" + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
         return handleMysql.selectMySQL("select * from roomchat",Name); //插入数据到表);
     }
 }

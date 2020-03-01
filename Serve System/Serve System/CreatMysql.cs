@@ -62,7 +62,7 @@ namespace Serv
                 mycomm.ExecuteNonQuery();
                 Console.WriteLine("建表完成");
             }
-            catch (MySqlException ex)
+            catch
             {
             }
             finally

@@ -13,7 +13,7 @@ public class HandlePlayerEvent
         Room room = player.tempData.room;
         RoomMgr.instance.LeaveRoom(player);
         if (room != null)
-            room.Broadcast(RoomMgr.instance.GetRoomList());
+            room.Broadcast(RoomMgr.instance.GetRoomList(player));
         
     }
 }
