@@ -12,41 +12,43 @@ public class RoomMgr
 		instance = this;
 	}
 	
-	//房间列表
+	//展厅列表
     public Dictionary<string, Room> list = new Dictionary<string, Room>();
-	//创建房间
+	//创建展厅
 	public void CreateRoom(Player player,string RoomName,string RoomAdress,string RoomIns)
 	{
+        //实例化展厅实体类
 		Room room = new Room ();
 		lock (list) 
 		{
-            room.Author = player.id;//将创建房间的玩家的ID赋值给房间
-            room.Name = RoomName;
-            room.Adress = RoomAdress;
-            room.Ins = RoomIns;
+            room.Author = player.id;//将创建展厅的用户ID赋值给展厅作者
+            room.Name = RoomName;//展厅名称
+            room.Adress = RoomAdress;//展厅地址
+            room.Ins = RoomIns;//展厅简介
             try
             {
-                list.Add(RoomName,room);
+                list.Add(RoomName,room);//再展厅字典中添加新建的展厅实体类类
             }
             catch { }
 		}
 	}
-    //删除房间
+    //删除展厅
     public bool DeleteRoom(Player player, string RoomName)
     {
+        //根据展厅名称判断是否存在该展厅
         if (list.Keys.Contains(RoomName))
         {
             lock (list)
             {
-                list.Remove(RoomName);
-                IHandleMysql handleMysql = new HandleMysql();
+                list.Remove(RoomName);//从展厅字典中移除展厅
+                IHandleMysql handleMysql = new HandleMysql();//调用接口，操纵数据库删除该展厅所有信息
                 handleMysql.deleteMySQL("delete from roomchat where RoomName = "+RoomName);
                 return true;
             }
         }
         else return false;
-        
     }
+
     //玩家离开
     public void LeaveRoom(Player player)
 	{
@@ -72,33 +74,43 @@ public class RoomMgr
         }
     }
 
-	//列表
+	//获取展厅列表
 	public ProtocolBytes GetRoomList(Player player)
 	{
         ProtocolBytes protocol = new ProtocolBytes ();
 		protocol.AddString ("GetRoomList");
-		int count = list.Count;
-		//房间数量
-		protocol.AddInt (count);
-		//每个房间信息
+		int count = 0;//初始化展厅数量
+       //展厅临时列表
+        Dictionary<string, Room> templist = new Dictionary<string, Room>();
+		//遍历字典添加每个展厅信息
 		foreach(Room room in list.Values)
 		{
+            //判断是否为用户当前选择的展厅
             if (player.tempData.mapadress == room.Adress)
             {
-                protocol.AddString(room.Name);
-                protocol.AddInt(room.list.Count);//房间中的人数
-                protocol.AddString(room.Author);
+                count++;
+                templist.Add(room.Name,room);
             }
         }
-		return protocol;
+        //添加展厅数量
+		protocol.AddInt (count);
+        //遍历字典添加每个展厅信息
+        foreach (Room room in templist.Values)
+        {
+            protocol.AddString(room.Name);//展厅名称
+            protocol.AddInt(room.list.Count);//目前展厅中的人数
+            protocol.AddString(room.Author);//展厅作者
+        }
+        return protocol;//返回协议
 	}
-    //获取房间信息
+
+    //获取展厅信息
     public ProtocolBytes GetRoomInfo(string name)
     {
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("GetRoomInfo");
-        //房间信息
-        protocol.AddString(list[name].Ins);//房间的简介，这里需要减1，由于传入的值是从1开始的，而list从0开始
+        //展厅的简介，这里需要减1，由于传入的值是从1开始的，而list从0开始
+        protocol.AddString(list[name].Ins);
         return protocol;
     }
 

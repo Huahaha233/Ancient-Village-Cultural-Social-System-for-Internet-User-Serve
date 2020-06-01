@@ -49,7 +49,7 @@ public class DataMgr
 		//防sql注入
 		if (!IsSafeStr(id))
 			return false;
-		//查询id是否存在
+		//遍历用户信息表，查询id是否存在
 		string cmdStr = string.Format("select * from user where UserID='{0}';", id);  
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);  
 		try 
@@ -72,17 +72,19 @@ public class DataMgr
 		//防sql注入
 		if (!IsSafeStr (id) || !IsSafeStr (pw)) 
 		{
-			Console.WriteLine("[DataMgr]Register 使用非法字符");
+			Console.WriteLine("[DataMgr]Register 使用非法字符");//提示
 			return false;
 		}
-		//能否注册
+		//判断是否该用户是否已存在
 		if (!CanRegister(id)) 
 		{
-			Console.WriteLine("[DataMgr]Register !CanRegister");
+			Console.WriteLine("[DataMgr]Register !CanRegister");//提示
 			return false;
 		}
-		//写入数据库User表
-		string cmdStr = string.Format("insert into user set UserID ='{0}' ,UserPSW ='{1}',Sex='{2}',Adress='{3}',Question='{4}',Answer='{5}',Phone='{6}';", id, pw,sex,adr,que,ans,phone);
+		//将用户注册信息写入数据库User表
+		string cmdStr = string.Format("insert into user set UserID ='{0}' ,UserPSW ='{1}',Sex='{2}',Adress='{3}',Question='{4}',Answer='{5}',Phone='{6}';",
+                                       id, pw,sex,adr,que,ans,phone);
+        //操作数据库
 		MySqlCommand cmd = new MySqlCommand(cmdStr, sqlConn);
 		try
 		{
@@ -204,15 +206,15 @@ public class DataMgr
 		//防sql注入
 		if (!IsSafeStr (id)||!IsSafeStr (pw))
 			return false;
-		//查询
+		//根据用户名与密码检验用户身份
 		string cmdStr = string.Format("select * from user where UserID='{0}' and UserPSW='{1}';", id, pw);  
 		MySqlCommand cmd = new MySqlCommand (cmdStr, sqlConn);  
 		try 
 		{
 			MySqlDataReader dataReader = cmd.ExecuteReader();
-			bool hasRows = dataReader.HasRows;
+			bool hasRows = dataReader.HasRows;//用户身份是否正确
 			dataReader.Close();
-			return hasRows;
+			return hasRows;//返回结果
 		}
 		catch(Exception e)
 		{

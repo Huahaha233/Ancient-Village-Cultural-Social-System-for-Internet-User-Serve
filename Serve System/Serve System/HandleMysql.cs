@@ -7,7 +7,7 @@ namespace Serve_System
 {
     interface IHandleMysql
     {
-        Dictionary<string, string> selectMySQL(string handlestr,string name);//name为条件
+        Dictionary<List<string>, List<string>> selectMySQL(string handlestr);
         void insertMySQL(string handlestr);
         void deleteMySQL(string handlestr);
     }
@@ -16,16 +16,17 @@ namespace Serve_System
     {
         public string connectStr= "server=localhost;user id=root;password=123456789;database=village;SslMode = none";
         
-        public Dictionary<string,string> selectMySQL(string handlestr,string name)
+        public Dictionary<List<string>, List<string>> selectMySQL(string handlestr)
         {
-            Dictionary<string, string> chat = new Dictionary<string, string>();
+            Dictionary<List<string>, List<string>> chat = new  Dictionary<List<string>, List<string>>();
+            List<string> name = new List<string>();
+            List<string> msg = new List<string>();
             //select查询操作
             MySqlConnection conn = new MySqlConnection(connectStr); //并没有去跟数据库建立链接
             try
             {
                 conn.Open();
                 Console.WriteLine("已经建立连接");
-
                 string sql = handlestr; //从表userinfo查询所有行数据
                 //string sql = "select * from userinfo"; //从表userinfo查询所有行数据
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
@@ -40,8 +41,10 @@ namespace Serve_System
                 //reader.Read()在读取下一行数据，如果读取成功，返回true, 如果没有下一行数据，读取失败，返回值为 false
                 while (reader.Read()) //利用reader.Read() 返回值 这个特性在while循环中遍历所有读取到数据
                 {
-                    if(reader[1].ToString()==name) chat.Add(reader[2].ToString() , reader[3].ToString());
+                    name.Add(reader[2].ToString());
+                    msg.Add(reader[3].ToString());
                 }
+                chat.Add(name,msg);
             }
             catch (Exception e)
             {

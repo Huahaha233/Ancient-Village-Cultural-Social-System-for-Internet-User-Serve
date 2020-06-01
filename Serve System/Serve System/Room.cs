@@ -47,16 +47,18 @@ public class Room
 		}
         return true;
 	}
-    //删除房间中的资源
+    //删除展厅中的资源
     public bool DeleteResoure(Player player,string ResoureName,string sort)
     {
+        //根据资源名称判断展厅中是否存在该资源
         if (resouredata.ContainsKey(ResoureName))
         {
             lock (resouredata)
             {
+                //根据资源名称检索到资源存储地址，再根据地址删除云服务器磁盘中的资源
                 File.Delete(@"C:"+resouredata[ResoureName].resoureadress);
-                resouredata.Remove(ResoureName);
-                RoomMgr.instance.ReFlashPlayData(player,sort,-1);
+                resouredata.Remove(ResoureName);//移除资源字典中的资源信息
+                RoomMgr.instance.ReFlashPlayData(player,sort,-1);//刷新用户信息
                 return true;
             }
         }
@@ -105,10 +107,10 @@ public class Room
         string nowtime = DateTime.Now.Year + "." + DateTime.Now.Month + "." + DateTime.Now.Day + "-" + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
         handleMysql.insertMySQL("insert into roomchat(ChatId,RoomName,PlayerId,ChatMessage,ChatTime) values(NULL,'"+Name+"', '"+id+"', '"+message+"', '"+nowtime+"')"); //插入数据到表);
     }
-    //增添房间的留言
-    public Dictionary<string,string> GetChatMessgae()
+    //获取房间的留言
+    public Dictionary<List<string>, List<string>> GetChatMessgae()
     {
         IHandleMysql handleMysql = new HandleMysql();
-        return handleMysql.selectMySQL("select * from roomchat",Name); //插入数据到表);
+        return handleMysql.selectMySQL("select * from roomchat where RoomName="+Name); //查询数据表);
     }
 }
